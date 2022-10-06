@@ -2,7 +2,9 @@ use std::io;
 
 use ff::{PrimeField, PrimeFieldBits};
 use group::Curve;
-use rand_core::RngCore;
+use rand::rngs::OsRng;
+use rand::RngCore;
+// use rand_core::RngCore;
 
 #[cfg(feature = "pairing")]
 use bls12_381::{hash_to_curve::HashToField, G1Affine, G1Projective, Scalar};
@@ -87,12 +89,11 @@ impl PrivateKey {
     }
 
     /// Generate a new private key.
-    pub fn generate<R: RngCore>(rng: &mut R) -> Self {
+    pub fn generate() -> Self {
         // IKM must be at least 32 bytes long:
         // https://tools.ietf.org/html/draft-irtf-cfrg-bls-signature-00#section-2.3
         let mut ikm = [0u8; 32];
-        rng.try_fill_bytes(&mut ikm)
-            .expect("unable to produce secure randomness");
+        OsRng.fill_bytes(&mut ikm);
 
         Self::new(ikm)
     }
